@@ -89,7 +89,7 @@ export default function FavoritesScreen({ navigation }) {
   };
 
   const handleGoCatalog = () => {
-    navigation?.navigate('Catalog');
+    navigation.navigate('ExploreTab', { screen: 'Catalog' });
   };
 
   if (loading && !refreshing) {
