@@ -1,14 +1,19 @@
 ﻿import React, { useCallback, useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 import productService from '../services/productService';
+import favoriteService from '../services/favoriteService';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import colors from '../theme/colors';
@@ -35,12 +40,37 @@ function formatPriceCLP(price) {
 
 export default function ProductDetailScreen({ route }) {
   const productId = route?.params?.productId ?? route?.params?.id;
+  const { user } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [imageError, setImageError] = useState(false);
+
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [togglingFavorite, setTogglingFavorite] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
+
+  const showFeedback = useCallback((text) => {
+    setFeedbackMessage(text);
+    setTimeout(() => {
+      setFeedbackMessage((prev) => (prev === text ? null : prev));
+    }, 2600);
+  }, []);
+
+  const syncFavoriteStatus = useCallback(async () => {
+    if (!productId) return;
+    try {
+      const favorites = await favoriteService.getFavorites();
+      const exists = favorites.some(
+        (item) => Number(item.id) === Number(productId)
+      );
+      setIsFavorite(exists);
+    } catch {
+      // Si falla silenciosamente la sincronización inicial, no bloquea el detalle
+    }
+  }, [productId]);
 
   const loadProduct = useCallback(
     async (isRefresh = false) => {
@@ -66,6 +96,7 @@ export default function ProductDetailScreen({ route }) {
         } else {
           setProduct(data);
           setImageError(false);
+          await syncFavoriteStatus();
         }
       } catch (err) {
         setProduct(null);
@@ -79,12 +110,49 @@ export default function ProductDetailScreen({ route }) {
         setRefreshing(false);
       }
     },
-    [productId]
+    [productId, syncFavoriteStatus]
   );
 
   useEffect(() => {
     loadProduct(false);
   }, [loadProduct]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (product) {
+        syncFavoriteStatus();
+      }
+    }, [product, syncFavoriteStatus])
+  );
+
+  const handleToggleFavorite = async () => {
+    if (!product || togglingFavorite) return;
+
+    setTogglingFavorite(true);
+    try {
+      if (isFavorite) {
+        await favoriteService.removeFavorite(product.id);
+        setIsFavorite(false);
+        showFeedback('Quitado de favoritos');
+      } else {
+        await favoriteService.addFavorite(product.id);
+        setIsFavorite(true);
+        showFeedback('Agregado a favoritos');
+      }
+    } catch (err) {
+      if (err?.status === 409) {
+        setIsFavorite(true);
+        showFeedback('El producto ya estaba en favoritos');
+      } else if (err?.status === 404 && isFavorite) {
+        setIsFavorite(false);
+        showFeedback('Quitado de favoritos');
+      } else {
+        showFeedback(err?.message || 'No se pudo actualizar favoritos');
+      }
+    } finally {
+      setTogglingFavorite(false);
+    }
+  };
 
   if (loading) {
     return <LoadingView message="Cargando detalle del producto..." />;
@@ -103,6 +171,9 @@ export default function ProductDetailScreen({ route }) {
     CONDITION_LABELS[product.condition] || product.condition || 'No especificada';
   const stockCount = Number(product.stock) || 0;
   const hasStock = stockCount > 0;
+  const isOwnProduct = Boolean(
+    user && product.seller && Number(user.id) === Number(product.seller.id)
+  );
 
   return (
     <ScrollView
@@ -116,6 +187,13 @@ export default function ProductDetailScreen({ route }) {
         />
       }
     >
+      {feedbackMessage ? (
+        <View style={styles.toastBanner}>
+          <Ionicons name="heart" size={16} color="#FFFFFF" />
+          <Text style={styles.toastText}>{feedbackMessage}</Text>
+        </View>
+      ) : null}
+
       <View style={styles.imageWrapper}>
         {product.imageUrl && !imageError ? (
           <Image
@@ -163,6 +241,46 @@ export default function ProductDetailScreen({ route }) {
           </Text>
         </View>
 
+        {!isOwnProduct ? (
+          <TouchableOpacity
+            style={[
+              styles.favoriteButton,
+              isFavorite ? styles.favoriteButtonActive : styles.favoriteButtonInactive,
+            ]}
+            onPress={handleToggleFavorite}
+            disabled={togglingFavorite}
+            activeOpacity={0.8}
+          >
+            {togglingFavorite ? (
+              <ActivityIndicator
+                size="small"
+                color={isFavorite ? '#FFFFFF' : colors.secondary || '#B91C1C'}
+              />
+            ) : (
+              <Ionicons
+                name={isFavorite ? 'heart' : 'heart-outline'}
+                size={26}
+                color={isFavorite ? '#FFFFFF' : colors.secondary || '#B91C1C'}
+              />
+            )}
+            <Text
+              style={[
+                styles.favoriteButtonText,
+                isFavorite
+                  ? styles.favoriteButtonTextActive
+                  : styles.favoriteButtonTextInactive,
+              ]}
+            >
+              {isFavorite ? 'En tus favoritos' : 'Agregar a favoritos'}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.ownProductNotice}>
+            <Ionicons name="person-outline" size={18} color="#475569" />
+            <Text style={styles.ownProductText}>Esta es tu propia publicación</Text>
+          </View>
+        )}
+
         <View style={styles.divider} />
 
         <Text style={styles.sectionTitle}>Descripción</Text>
@@ -205,6 +323,20 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingBottom: 28,
+  },
+  toastBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#0F172A',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  toastText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '600',
   },
   imageWrapper: {
     width: '100%',
@@ -284,9 +416,52 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginBottom: 16,
   },
   stockText: {
     fontSize: 14,
+    fontWeight: '600',
+  },
+  favoriteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  favoriteButtonInactive: {
+    backgroundColor: '#FFF1F2',
+    borderColor: colors.secondary || '#B91C1C',
+  },
+  favoriteButtonActive: {
+    backgroundColor: colors.secondary || '#B91C1C',
+    borderColor: colors.secondary || '#B91C1C',
+  },
+  favoriteButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  favoriteButtonTextInactive: {
+    color: colors.secondary || '#B91C1C',
+  },
+  favoriteButtonTextActive: {
+    color: '#FFFFFF',
+  },
+  ownProductNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#F1F5F9',
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  ownProductText: {
+    fontSize: 13,
+    color: '#475569',
     fontWeight: '600',
   },
   divider: {
