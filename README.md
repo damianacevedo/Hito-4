@@ -250,3 +250,53 @@ Los ejemplos de prompts se presentan resumidos y no como transcripciones literal
 La inteligencia artificial se utilizó como herramienta de apoyo. Los cambios fueron revisados mediante pruebas reales antes de incorporarlos al repositorio.
 
 Cada integrante del equipo debe presentar su propia declaración según las herramientas y procedimientos que utilizó.
+
+### 10. Declaraciones individuales de IA del equipo
+
+Las siguientes declaraciones corresponden a borradores elaborados según las responsabilidades de cada integrante. Cada estudiante deberá confirmar las herramientas utilizadas, las consultas realizadas y los resultados obtenidos antes de su entrega definitiva.
+
+#### Javier Leiva — Inicio de sesión y perfil
+
+**Herramienta utilizada:** Pendiente de confirmar.
+
+**Propósito:** Apoyar la comprensión de errores de programación y la revisión de las funcionalidades relacionadas con la autenticación y la gestión del perfil de usuario.
+
+**Prompts de referencia:** Consultas sobre validación de credenciales, autenticación JWT, manejo de respuestas del backend y actualización de información personal.
+
+**Resultados:** Pendiente de confirmar las recomendaciones utilizadas y los cambios implementados con apoyo de IA.
+
+**Validación:** Pendiente de especificar las pruebas realizadas sobre el inicio de sesión y el perfil.
+
+**Aprendizaje:** Pendiente de confirmar los conocimientos adquiridos durante el desarrollo.
+
+#### Damián Acevedo — Catálogo y pedidos
+
+**Herramienta utilizada:** Pendiente de confirmar.
+
+**Propósito:** Apoyar la revisión de la estructura de componentes, la interpretación de errores técnicos y el desarrollo de las funcionalidades del catálogo y los pedidos.
+
+**Prompts de referencia:** Consultas sobre consumo de API REST, búsqueda y filtrado de productos, visualización de pedidos y manejo de estados de carga y error.
+
+**Resultados:** Pendiente de confirmar las soluciones propuestas por IA que fueron utilizadas en el proyecto.
+
+**Validación:** Pendiente de especificar las pruebas realizadas en el catálogo y el módulo de pedidos.
+
+**Aprendizaje:** Pendiente de confirmar los conocimientos adquiridos durante la implementación.
+
+#### Fernando Arancibia — Productos, favoritos y arquitectura
+
+**Herramienta utilizada:** Pendiente de confirmar.
+
+**Propósito:** Apoyar el análisis de componentes de React Native, la organización de funcionalidades y la documentación de la arquitectura del sistema.
+
+**Prompts de referencia:** Consultas sobre visualización de productos, gestión de favoritos, comunicación entre la aplicación móvil y el backend, y representación de la arquitectura del proyecto.
+
+**Resultados:** Pendiente de confirmar las sugerencias utilizadas para implementar funcionalidades o elaborar documentación.
+
+**Validación:** Pendiente de especificar las verificaciones realizadas sobre productos, favoritos y arquitectura.
+
+**Aprendizaje:** Pendiente de confirmar los conocimientos adquiridos durante el desarrollo.
+
+#### Responsabilidad del equipo
+
+La inteligencia artificial debe utilizarse como herramienta complementaria, manteniendo la revisión y validación humana de las soluciones implementadas. Cada integrante es responsable de confirmar la exactitud de su declaración antes de presentarla como definitiva.
