@@ -12,8 +12,8 @@ export default function App() {
         <NavigationContainer>
           <AppNavigator />
         </NavigationContainer>
-        {/* Íconos claros: los headers y el login tienen fondo azul oscuro. */}
-        <StatusBar style="light" />
+        {/* Íconos oscuros: los headers y el login tienen fondo claro. */}
+        <StatusBar style="dark" />
       </AuthProvider>
     </SafeAreaProvider>
   );

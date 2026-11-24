@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import {
-  ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,7 +13,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import AppButton from '../components/AppButton';
 import colors from '../theme/colors';
+
+const logo = require('../../assets/logo_marketplace_unab.png');
 
 // Mismo criterio básico que @IsEmail del backend: texto@texto.dominio, sin espacios.
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,6 +57,8 @@ export default function LoginScreen() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [apiError, setApiError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  // Campo con foco, para marcar su borde en rojo (como .form-control:focus de la web).
+  const [focusedField, setFocusedField] = useState(null);
 
   const handleEmailChange = (value) => {
     setEmail(value);
@@ -94,6 +99,12 @@ export default function LoginScreen() {
     }
   };
 
+  // Borde del campo: rojo si tiene error o foco; gris en otro caso.
+  const fieldStyle = (field) => [
+    focusedField === field && styles.inputFocused,
+    fieldErrors[field] && styles.inputError,
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -104,20 +115,34 @@ export default function LoginScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.brand}>
-            <Ionicons name="storefront-outline" size={48} color={colors.textOnPrimary} />
-            <Text style={styles.brandTitle}>Marketplace UNAB</Text>
-            <Text style={styles.brandSubtitle}>Inicia sesión para continuar</Text>
-          </View>
-
           <View style={styles.card}>
+            <Image
+              source={logo}
+              style={styles.logo}
+              resizeMode="contain"
+              accessibilityLabel="Marketplace UNAB"
+            />
+
+            <Text style={styles.title}>Iniciar sesión</Text>
+            <Text style={styles.subtitle}>Ingresa con tu correo y contraseña.</Text>
+
+            {/* Error de la API, arriba del formulario como el alert de la web */}
+            {apiError ? (
+              <View style={styles.errorBox}>
+                <Ionicons name="warning" size={18} color={colors.danger} />
+                <Text style={styles.errorText}>{apiError}</Text>
+              </View>
+            ) : null}
+
             {/* Correo */}
             <Text style={styles.label}>Correo</Text>
             <TextInput
               ref={emailRef}
-              style={[styles.input, fieldErrors.email && styles.inputError]}
+              style={[styles.input, ...fieldStyle('email')]}
               value={email}
               onChangeText={handleEmailChange}
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
               placeholder="nombre@unab.cl"
               placeholderTextColor={colors.inactive}
               keyboardType="email-address"
@@ -135,12 +160,14 @@ export default function LoginScreen() {
 
             {/* Contraseña con botón para mostrar u ocultar */}
             <Text style={[styles.label, styles.labelSpacing]}>Contraseña</Text>
-            <View style={[styles.passwordWrapper, fieldErrors.password && styles.inputError]}>
+            <View style={[styles.passwordWrapper, ...fieldStyle('password')]}>
               <TextInput
                 ref={passwordRef}
                 style={styles.passwordInput}
                 value={password}
                 onChangeText={handlePasswordChange}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
                 placeholder="Tu contraseña"
                 placeholderTextColor={colors.inactive}
                 secureTextEntry={!showPassword}
@@ -170,26 +197,13 @@ export default function LoginScreen() {
               <Text style={styles.fieldError}>{fieldErrors.password}</Text>
             ) : null}
 
-            {/* Error de la API */}
-            {apiError ? (
-              <View style={styles.errorBox}>
-                <Ionicons name="alert-circle" size={18} color={colors.danger} />
-                <Text style={styles.errorText}>{apiError}</Text>
-              </View>
-            ) : null}
-
-            <TouchableOpacity
-              style={[styles.button, submitting && styles.buttonDisabled]}
+            <AppButton
+              title="Iniciar sesión"
+              loadingTitle="Ingresando..."
+              loading={submitting}
               onPress={handleSubmit}
-              disabled={submitting}
-              activeOpacity={0.85}
-            >
-              {submitting ? (
-                <ActivityIndicator color={colors.textOnPrimary} />
-              ) : (
-                <Text style={styles.buttonText}>Iniciar sesión</Text>
-              )}
-            </TouchableOpacity>
+              style={styles.submitButton}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -200,7 +214,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.background,
   },
   flex: {
     flex: 1,
@@ -208,27 +222,37 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 24,
-  },
-  brand: {
-    alignItems: 'center',
-    marginBottom: 28,
-  },
-  brandTitle: {
-    marginTop: 10,
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.textOnPrimary,
-  },
-  brandSubtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#CBD5E1',
+    padding: 20,
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 14,
-    padding: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 22,
+    shadowColor: colors.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  logo: {
+    width: '100%',
+    maxWidth: 280,
+    aspectRatio: 2172 / 724, // proporción del PNG
+    alignSelf: 'center',
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  subtitle: {
+    marginTop: 4,
+    marginBottom: 20,
+    fontSize: 14,
+    color: colors.textMuted,
   },
   label: {
     fontSize: 14,
@@ -242,12 +266,15 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 10,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
     color: colors.text,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
+  },
+  inputFocused: {
+    borderColor: colors.primary,
   },
   inputError: {
     borderColor: colors.danger,
@@ -257,8 +284,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 10,
-    backgroundColor: colors.background,
+    borderRadius: 8,
+    backgroundColor: colors.surface,
   },
   passwordInput: {
     flex: 1,
@@ -280,31 +307,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: colors.dangerLight,
+    borderWidth: 1,
+    borderColor: colors.danger,
     borderRadius: 8,
     padding: 10,
-    marginTop: 16,
+    marginBottom: 16,
   },
   errorText: {
     flex: 1,
     fontSize: 13,
     color: colors.danger,
   },
-  button: {
-    backgroundColor: colors.secondary,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 50,
-    marginTop: 20,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: '700',
+  submitButton: {
+    marginTop: 24,
   },
 });
