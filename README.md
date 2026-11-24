@@ -212,3 +212,39 @@ También utilicé Claude Code como apoyo en la implementación de los datos de d
 Las herramientas de IA facilitaron el desarrollo y la resolución de problemas, mientras que las verificaciones, pruebas y decisiones de integración se realizaron bajo mi supervisión.
 
 Esta declaración corresponde únicamente a mi participación en el proyecto. Cada integrante debe documentar su propio uso de herramientas de inteligencia artificial.
+
+### 9. Registro detallado de uso de IA
+
+Este registro corresponde a mi participación en las tareas M03, M14 y M15.
+
+Los ejemplos de prompts se presentan resumidos y no como transcripciones literales.
+
+#### ChatGPT
+
+**Propósito:** Apoyar la configuración del entorno, resolver problemas técnicos, organizar pruebas y elaborar la documentación.
+
+**Prompts utilizados:** Las consultas abordaron cómo conectar el emulador Android con una API NestJS ejecutada en Docker, solucionar errores de conexión, verificar datos de demostración, realizar pruebas funcionales y documentar los procedimientos en el README.
+
+**Resultados:** Se consiguió establecer la comunicación entre Expo y el backend, ejecutar pruebas en Android, comprobar pedidos y favoritos, registrar los resultados QA y documentar la instalación y las funcionalidades móviles.
+
+**Validación:** Ejecuté los comandos en PowerShell, revisé los resultados de Docker y PostgreSQL y comprobé personalmente las funcionalidades mediante el emulador Android.
+
+**Aprendizaje:** Comprendí mejor la comunicación entre Android y una API local, el uso de ADB, la importancia de las pruebas de conectividad y la necesidad de verificar las respuestas generadas por IA antes de aplicarlas.
+
+#### Claude Code
+
+**Propósito:** Apoyar la implementación de datos de demostración para facilitar las pruebas del módulo de pedidos y favoritos.
+
+**Prompts utilizados:** Las instrucciones solicitaron incorporar pedidos y favoritos al seed existente, conservar los datos originales, evitar duplicaciones y mantener la compatibilidad con el backend.
+
+**Resultados:** Se incorporaron dos pedidos de demostración, uno pagado y otro pendiente, junto con favoritos de prueba.
+
+**Validación:** Revisé las modificaciones del archivo seed.ts, comprobé la compilación del backend, ejecuté el seed en Docker, consulté PostgreSQL y verifiqué los pedidos en Android. También reinicié el backend para comprobar que no se duplicaran los datos.
+
+**Aprendizaje:** Reforcé la importancia de revisar los cambios generados por IA, trabajar en ramas independientes, comprobar la integridad de los datos y realizar pruebas antes de crear un commit.
+
+#### Responsabilidad y supervisión
+
+La inteligencia artificial se utilizó como herramienta de apoyo. Los cambios fueron revisados mediante pruebas reales antes de incorporarlos al repositorio.
+
+Cada integrante del equipo debe presentar su propia declaración según las herramientas y procedimientos que utilizó.
