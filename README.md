@@ -5,6 +5,8 @@ Marketplace UNAB Móvil es una aplicación desarrollada con React Native y Expo 
 
 La aplicación utiliza el mismo backend NestJS y las mismas bases de datos que la versión web.
 
+Consulta el [diagrama de arquitectura](docs/Arquitectura.png) y la [documentación técnica](docs/arquitectura-hito4.md).
+
 ### Requisitos previos
 
 - Node.js y npm.
