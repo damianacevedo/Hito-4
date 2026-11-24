@@ -1,6 +1,7 @@
 
 import 'reflect-metadata';
 import * as bcrypt from 'bcrypt';
+import { EntityManager } from 'typeorm';
 import AppDataSource from '../data-source';
 import { User, UserRole } from '../../users/entities/user.entity';
 import { Category } from '../../categories/entities/category.entity';
@@ -8,6 +9,14 @@ import {
   Product,
   ProductCondition,
 } from '../../products/entities/product.entity';
+import { Favorite } from '../../favorites/entities/favorite.entity';
+import { Order, OrderStatus } from '../../orders/entities/order.entity';
+import { OrderItem } from '../../orders/entities/order-item.entity';
+import {
+  Transaction,
+  TransactionMethod,
+  TransactionStatus,
+} from '../../orders/entities/transaction.entity';
 
 interface SeedProduct {
   title: string;
@@ -122,6 +131,138 @@ const products: SeedProduct[] = [
   { title: 'Pack de colaciones variadas', description: 'Selección de snacks envasados para acompañar la jornada universitaria.', price: 5000, categorySlug: 'snacks', sellerIndex: 3, condition: ProductCondition.NUEVO },
 ];
 
+// Datos de demostración del Hito 4: pedidos y favoritos para el comprador de prueba.
+// Los productos se identifican por título + correo del vendedor, nunca por ID.
+const DEMO_BUYER_EMAIL = 'comprador1@unab.cl';
+
+const demoFavorites = [
+  { title: 'Calculadora Científica Casio FX-991', sellerEmail: 'vendedor2@unab.cl' },
+  { title: 'Audífonos Inalámbricos Sony WH-CH520', sellerEmail: 'vendedor3@unab.cl' },
+];
+
+const demoOrders = [
+  { title: 'Lámpara LED para escritorio', sellerEmail: 'vendedor1@unab.cl', status: OrderStatus.PAID },
+  { title: 'Set de destacadores pastel', sellerEmail: 'vendedor2@unab.cl', status: OrderStatus.PENDING },
+];
+
+function findDemoProduct(
+  manager: EntityManager,
+  title: string,
+  sellerEmail: string,
+): Promise<Product | null> {
+  return manager
+    .getRepository(Product)
+    .createQueryBuilder('product')
+    .innerJoin('product.seller', 'seller')
+    .where('product.title = :title', { title })
+    .andWhere('seller.email = :sellerEmail', { sellerEmail })
+    .getOne();
+}
+
+// Idempotente: se ejecuta en cada arranque del backend y nunca duplica ni borra datos.
+// Si falta algo, avisa y lo omite, para no impedir que la API arranque.
+async function seedDemoData(manager: EntityManager): Promise<void> {
+  const buyer = await manager
+    .getRepository(User)
+    .findOne({ where: { email: DEMO_BUYER_EMAIL } });
+
+  if (!buyer) {
+    console.warn(`Demo omitida: no existe el usuario ${DEMO_BUYER_EMAIL}.`);
+    return;
+  }
+
+  // Favoritos: ON CONFLICT DO NOTHING sobre la clave (userId, productId)
+  for (const item of demoFavorites) {
+    const product = await findDemoProduct(manager, item.title, item.sellerEmail);
+
+    if (!product || !product.isActive || product.stock < 1) {
+      console.warn(`Favorito demo omitido: '${item.title}' no está disponible.`);
+      continue;
+    }
+
+    await manager
+      .createQueryBuilder()
+      .insert()
+      .into(Favorite)
+      .values({ userId: buyer.id, productId: product.id })
+      .orIgnore()
+      .execute();
+  }
+
+  // Pedidos: uno por comprador + producto, sin importar su estado actual
+  for (const item of demoOrders) {
+    const product = await findDemoProduct(manager, item.title, item.sellerEmail);
+
+    if (!product) {
+      console.warn(`Pedido demo omitido: no existe '${item.title}'.`);
+      continue;
+    }
+
+    const alreadyExists = await manager
+      .getRepository(OrderItem)
+      .createQueryBuilder('item')
+      .innerJoin('item.order', 'order')
+      .where('order.buyerId = :buyerId', { buyerId: buyer.id })
+      .andWhere('item.productId = :productId', { productId: product.id })
+      .getCount();
+
+    if (alreadyExists > 0) {
+      console.log(`Pedido demo ya existente para '${item.title}', no se modifica.`);
+      continue;
+    }
+
+    // Descuento condicional y atómico: solo baja si queda stock, nunca deja negativos
+    const stockUpdate = await manager
+      .createQueryBuilder()
+      .update(Product)
+      .set({ stock: () => '"stock" - 1' })
+      .where('id = :id', { id: product.id })
+      .andWhere('"stock" >= 1')
+      .andWhere('"isActive" = true')
+      .execute();
+
+    if (stockUpdate.affected !== 1) {
+      console.warn(`Pedido demo omitido: '${item.title}' sin stock o inactivo.`);
+      continue;
+    }
+
+    const orderRepository = manager.getRepository(Order);
+    const order = await orderRepository.save(
+      orderRepository.create({
+        buyerId: buyer.id,
+        total: product.price,
+        status: item.status,
+      }),
+    );
+
+    const orderItemRepository = manager.getRepository(OrderItem);
+    await orderItemRepository.save(
+      orderItemRepository.create({
+        orderId: order.id,
+        productId: product.id,
+        sellerId: product.sellerId,
+        quantity: 1,
+        unitPrice: product.price,
+      }),
+    );
+
+    // Un pedido pagado siempre tiene su pago simulado aprobado
+    if (item.status === OrderStatus.PAID) {
+      const transactionRepository = manager.getRepository(Transaction);
+      await transactionRepository.save(
+        transactionRepository.create({
+          orderId: order.id,
+          amount: order.total,
+          method: TransactionMethod.SIMULATED,
+          status: TransactionStatus.APPROVED,
+        }),
+      );
+    }
+
+    console.log(`Pedido demo #${order.id} creado (${item.status}): '${item.title}'.`);
+  }
+}
+
 async function seed(): Promise<void> {
   await AppDataSource.initialize();
 
@@ -199,6 +340,9 @@ async function seed(): Promise<void> {
         `Seed completado: ${savedUsers.length} usuarios, ${savedCategories.length} categorías y ${savedProducts.length} productos.`,
       );
     });
+
+    // Datos de demostración en su propia transacción: todo o nada
+    await AppDataSource.transaction(seedDemoData);
   } finally {
     await AppDataSource.destroy();
   }
