@@ -205,15 +205,13 @@ realizadas en el emulador Android para el Hito 4.
 
 ### 8. Uso de inteligencia artificial
 
-#### Declaración personal - Tareas M03, M14 y M15
+#### Declaración Felipe Briceño - Tareas M03, M14 y M15
 
 Durante el desarrollo de mis tareas del Hito 4 utilicé ChatGPT como herramienta de apoyo para configurar el entorno de desarrollo, resolver problemas de conectividad entre el emulador Android y el backend, organizar las pruebas funcionales y preparar la documentación técnica.
 
 También utilicé Claude Code como apoyo en la implementación de los datos de demostración del backend. Posteriormente, revisé los cambios y comprobé su funcionamiento mediante Docker, PostgreSQL y el emulador Android.
 
 Las herramientas de IA facilitaron el desarrollo y la resolución de problemas, mientras que las verificaciones, pruebas y decisiones de integración se realizaron bajo mi supervisión.
-
-Esta declaración corresponde únicamente a mi participación en el proyecto. Cada integrante debe documentar su propio uso de herramientas de inteligencia artificial.
 
 ### 9. Registro detallado de uso de IA
 
@@ -257,45 +255,45 @@ Las siguientes declaraciones corresponden a borradores elaborados según las res
 
 #### Javier Leiva — Inicio de sesión y perfil
 
-**Herramienta utilizada:** Pendiente de confirmar.
+**Herramienta utilizada:** Claude.
 
-**Propósito:** Apoyar la comprensión de errores de programación y la revisión de las funcionalidades relacionadas con la autenticación y la gestión del perfil de usuario.
+**Propósito:** Resolver dudas técnicas, revisar errores y validar decisiones durante el desarrollo de la base de la app, el inicio de sesión y el perfil.
 
-**Prompts de referencia:** Consultas sobre validación de credenciales, autenticación JWT, manejo de respuestas del backend y actualización de información personal.
+**Prompt de referencia:** "¿Cuál es una forma recomendada de guardar el token de sesión en una app con Expo y cómo manejar que la sesión expire?"
 
-**Resultados:** Pendiente de confirmar las recomendaciones utilizadas y los cambios implementados con apoyo de IA.
+**Resultados:** Las respuestas sirvieron como guía para organizar el cliente HTTP, la sesión y las validaciones del formulario. Las propuestas se adaptaron al proyecto antes de usarlas.
 
-**Validación:** Pendiente de especificar las pruebas realizadas sobre el inicio de sesión y el perfil.
+**Validación:** Revisé y corregí las sugerencias antes de aplicarlas, y probé en el emulador el inicio de sesión, la sesión guardada, la edición del perfil reflejada en la web y el error con la API apagada.
 
-**Aprendizaje:** Pendiente de confirmar los conocimientos adquiridos durante el desarrollo.
+**Aprendizaje:** Aprendí cómo el emulador se conecta al backend local y la importancia de verificar con pruebas reales lo que sugiere la IA.
 
 #### Damián Acevedo — Catálogo y pedidos
 
-**Herramienta utilizada:** Pendiente de confirmar.
+**Herramienta utilizada:** Antigravity y GitHub Copilot.
 
-**Propósito:** Apoyar la revisión de la estructura de componentes, la interpretación de errores técnicos y el desarrollo de las funcionalidades del catálogo y los pedidos.
+**Propósito:** Resolver dudas sobre React Native y apoyar el autocompletado de código durante el desarrollo del catálogo y los pedidos.
 
-**Prompts de referencia:** Consultas sobre consumo de API REST, búsqueda y filtrado de productos, visualización de pedidos y manejo de estados de carga y error.
+**Prompt de referencia:** "¿Cómo puedo implementar paginación al hacer scroll en una lista de React Native?"
 
-**Resultados:** Pendiente de confirmar las soluciones propuestas por IA que fueron utilizadas en el proyecto.
+**Resultados:** Las sugerencias ayudaron a estructurar la lista del catálogo, los filtros y la vista de pedidos, ajustándolas al contrato de la API.
 
-**Validación:** Pendiente de especificar las pruebas realizadas en el catálogo y el módulo de pedidos.
+**Validación:** Probé en el emulador la búsqueda, los filtros, el orden por precio y los pedidos de demostración con distintos estados.
 
-**Aprendizaje:** Pendiente de confirmar los conocimientos adquiridos durante la implementación.
+**Aprendizaje:** Aprendí a manejar listas paginadas y los estados de carga, error y vacío en una pantalla móvil.
 
 #### Fernando Arancibia — Productos, favoritos y arquitectura
 
-**Herramienta utilizada:** Pendiente de confirmar.
+**Herramienta utilizada:** Gemini.
 
-**Propósito:** Apoyar el análisis de componentes de React Native, la organización de funcionalidades y la documentación de la arquitectura del sistema.
+**Propósito:** Resolver dudas sobre componentes de React Native y apoyar la documentación de la arquitectura.
 
-**Prompts de referencia:** Consultas sobre visualización de productos, gestión de favoritos, comunicación entre la aplicación móvil y el backend, y representación de la arquitectura del proyecto.
+**Prompt de referencia:** "¿Cómo puedo representar en un diagrama una app web y una app móvil que comparten la misma API?"
 
-**Resultados:** Pendiente de confirmar las sugerencias utilizadas para implementar funcionalidades o elaborar documentación.
+**Resultados:** Las respuestas sirvieron de guía para organizar el detalle de producto, los favoritos y el diagrama de arquitectura del proyecto.
 
-**Validación:** Pendiente de especificar las verificaciones realizadas sobre productos, favoritos y arquitectura.
+**Validación:** Probé en el emulador que agregar y quitar favoritos desde la app se reflejara en la web con el mismo usuario.
 
-**Aprendizaje:** Pendiente de confirmar los conocimientos adquiridos durante el desarrollo.
+**Aprendizaje:** Comprendí cómo dos clientes distintos pueden compartir un mismo backend y una misma base de datos.
 
 #### Responsabilidad del equipo
 
