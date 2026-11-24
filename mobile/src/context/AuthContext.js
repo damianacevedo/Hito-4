@@ -1,4 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import * as SecureStore from 'expo-secure-store';
 import api, { setAuthToken, setUnauthorizedHandler } from '../services/api';
 
@@ -6,6 +14,9 @@ const AuthContext = createContext(null);
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
+
+// Campos del usuario de la sesión (misma forma que devuelve POST /auth/login).
+const SESSION_USER_FIELDS = ['id', 'name', 'email', 'role', 'career', 'campus'];
 
 // Lee la sesión guardada. Si el usuario guardado está corrupto, se descarta todo.
 async function readStoredSession() {
@@ -33,9 +44,17 @@ async function clearStoredSession() {
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUserState] = useState(null);
   // true mientras se recupera la sesión guardada al abrir la app.
   const [loading, setLoading] = useState(true);
+
+  // Copia síncrona del usuario actual, para que updateUser sea una función estable
+  // (no cambia en cada render) y siempre mezcle sobre el valor más reciente.
+  const userRef = useRef(null);
+  const setUser = useCallback((nextUser) => {
+    userRef.current = nextUser;
+    setUserState(nextUser);
+  }, []);
 
   // Al abrir la app, recupera la sesión guardada en SecureStore.
   useEffect(() => {
@@ -58,7 +77,7 @@ export function AuthProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [setUser]);
 
   // POST /auth/login → { accessToken, user }.
   // Si la API falla, el error de api.js se propaga tal cual (err.message y err.status).
@@ -85,7 +104,7 @@ export function AuthProvider({ children }) {
     setToken(data.accessToken);
     setUser(data.user);
     return data.user;
-  }, []);
+  }, [setUser]);
 
   const logout = useCallback(async () => {
     setAuthToken(null);
@@ -97,7 +116,36 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.warn('No se pudo borrar la sesión guardada:', err?.message);
     }
-  }, []);
+  }, [setUser]);
+
+  // Actualiza el usuario de la sesión (ej. tras GET o PATCH /users/me) sin tocar el token.
+  // Mezcla los datos nuevos sobre el user actual, copiando solo los campos de la sesión,
+  // para que el user guardado mantenga la misma forma que en el login.
+  const updateUser = useCallback(
+    async (changes) => {
+      const current = userRef.current;
+      if (!current || !changes) return current; // sin sesión (ej. tras logout) no hace nada
+
+      const next = { ...current };
+      let changed = false;
+      SESSION_USER_FIELDS.forEach((key) => {
+        if (changes[key] !== undefined && changes[key] !== current[key]) {
+          next[key] = changes[key];
+          changed = true;
+        }
+      });
+      if (!changed) return current;
+
+      setUser(next);
+      try {
+        await SecureStore.setItemAsync(USER_KEY, JSON.stringify(next));
+      } catch (err) {
+        console.warn('No se pudo guardar el usuario actualizado:', err?.message);
+      }
+      return next;
+    },
+    [setUser]
+  );
 
   // Si la API responde 401 a una petición con token (sesión expirada), se cierra la sesión.
   useEffect(() => {
@@ -106,8 +154,8 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   const value = useMemo(
-    () => ({ user, token, login, logout, loading }),
-    [user, token, login, logout, loading]
+    () => ({ user, token, login, logout, updateUser, loading }),
+    [user, token, login, logout, updateUser, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
