@@ -11,6 +11,7 @@ import CatalogScreen from '../screens/CatalogScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import OrdersScreen from '../screens/OrdersScreen';
+import OrderDetailScreen from '../screens/OrderDetailScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const RootStack = createNativeStackNavigator();
@@ -71,6 +72,11 @@ function OrdersStackNavigator() {
   return (
     <OrdersStack.Navigator screenOptions={stackScreenOptions}>
       <OrdersStack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Mis pedidos' }} />
+      <OrdersStack.Screen
+        name="OrderDetail"
+        component={OrderDetailScreen}
+        options={{ title: 'Detalle del pedido' }}
+      />
     </OrdersStack.Navigator>
   );
 }
