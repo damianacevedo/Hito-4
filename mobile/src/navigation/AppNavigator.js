@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,11 +22,16 @@ const OrdersStack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Header común de todos los stacks: fondo institucional y texto blanco.
+// Fondo del header como .navbar-unab de la web: blanco con línea roja de 2 px abajo.
+function HeaderBackground() {
+  return <View style={styles.headerBackground} />;
+}
+
+// Header común de todos los stacks: título oscuro en negrita y botón atrás en rojo.
 const stackScreenOptions = {
-  headerStyle: { backgroundColor: colors.primary },
-  headerTintColor: colors.textOnPrimary,
-  headerTitleStyle: { fontWeight: '700' },
+  headerBackground: HeaderBackground,
+  headerTintColor: colors.primary, // botón atrás
+  headerTitleStyle: { color: colors.text, fontWeight: '700' },
   headerBackButtonDisplayMode: 'minimal',
   contentStyle: { backgroundColor: colors.background },
 };
@@ -95,7 +101,9 @@ function MainTabs() {
       screenOptions={({ route }) => ({
         headerShown: false, // cada pestaña usa el header de su stack
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.inactive,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: styles.tabBar,
+        tabBarLabelStyle: styles.tabBarLabel,
         tabBarIcon: ({ focused, color, size }) => {
           const [activeIcon, inactiveIcon] = TAB_ICONS[route.name];
           return <Ionicons name={focused ? activeIcon : inactiveIcon} size={size} color={color} />;
@@ -133,3 +141,19 @@ export default function AppNavigator() {
     </RootStack.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  headerBackground: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.primary,
+  },
+  tabBar: {
+    backgroundColor: colors.surface,
+    borderTopColor: colors.border,
+  },
+  tabBarLabel: {
+    fontWeight: '600',
+  },
+});

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -9,12 +8,12 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import userService from '../services/userService';
+import AppButton from '../components/AppButton';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import colors from '../theme/colors';
@@ -86,12 +85,16 @@ function InfoRow({ icon, label, value }) {
 }
 
 function FormField({ label, error, style, ...inputProps }) {
+  // Borde rojo con foco, como .form-control:focus de la web.
+  const [focused, setFocused] = useState(false);
   return (
     <View style={styles.formField}>
       <Text style={styles.formLabel}>{label}</Text>
       <TextInput
-        style={[styles.input, error && styles.inputError, style]}
+        style={[styles.input, focused && styles.inputFocused, error && styles.inputError, style]}
         placeholderTextColor={colors.inactive}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         {...inputProps}
       />
       {error ? <Text style={styles.fieldError}>{error}</Text> : null}
@@ -228,7 +231,9 @@ export default function ProfileScreen() {
         ) : null}
 
         <View style={styles.header}>
-          <Ionicons name="person-circle-outline" size={76} color={colors.primary} />
+          <View style={styles.avatar}>
+            <Ionicons name="person" size={44} color={colors.primary} />
+          </View>
           <Text style={styles.name}>{displayValue(profile?.name)}</Text>
           <View style={styles.roleBadge}>
             <Text style={styles.roleBadgeText}>{roleLabel}</Text>
@@ -290,26 +295,19 @@ export default function ProfileScreen() {
             ) : null}
 
             <View style={styles.formButtons}>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonOutline]}
+              <AppButton
+                title="Cancelar"
+                variant="outline"
                 onPress={handleCancelEditing}
                 disabled={saving}
-                activeOpacity={0.85}
-              >
-                <Text style={[styles.buttonText, styles.buttonOutlineText]}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonPrimary, saving && styles.buttonDisabled]}
+                style={styles.rowButton}
+              />
+              <AppButton
+                title="Guardar"
+                loading={saving}
                 onPress={handleSave}
-                disabled={saving}
-                activeOpacity={0.85}
-              >
-                {saving ? (
-                  <ActivityIndicator color={colors.textOnPrimary} />
-                ) : (
-                  <Text style={styles.buttonText}>Guardar</Text>
-                )}
-              </TouchableOpacity>
+                style={styles.rowButton}
+              />
             </View>
           </View>
         ) : (
@@ -323,26 +321,23 @@ export default function ProfileScreen() {
               <InfoRow icon="ribbon-outline" label="Rol" value={roleLabel} />
             </View>
 
-            <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary, styles.fullButton]}
+            <AppButton
+              title="Editar perfil"
+              icon="create-outline"
               onPress={handleStartEditing}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="create-outline" size={20} color={colors.textOnPrimary} />
-              <Text style={styles.buttonText}>Editar perfil</Text>
-            </TouchableOpacity>
+              style={styles.fullButton}
+            />
           </>
         )}
 
-        <TouchableOpacity
-          style={[styles.button, styles.buttonDanger, styles.fullButton]}
+        <AppButton
+          title="Cerrar sesión"
+          icon="log-out-outline"
+          variant="outline"
           onPress={handleLogout}
           disabled={saving}
-          activeOpacity={0.85}
-        >
-          <Ionicons name="log-out-outline" size={20} color={colors.textOnPrimary} />
-          <Text style={styles.buttonText}>Cerrar sesión</Text>
-        </TouchableOpacity>
+          style={styles.fullButton}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -364,36 +359,51 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primaryLight,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
   name: {
-    marginTop: 6,
+    marginTop: 10,
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
     textAlign: 'center',
   },
+  // Como .btn-soft-primary de la web: fondo rojo suave y texto rojo.
   roleBadge: {
     marginTop: 8,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   roleBadgeText: {
-    color: colors.textOnPrimary,
+    color: colors.primary,
     fontSize: 12,
     fontWeight: '700',
+    letterSpacing: 0.3,
     textTransform: 'uppercase',
   },
+  // Como .filter-card de la web: blanca, borde gris y sombra suave.
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: colors.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1,
   },
   cardTitle: {
     fontSize: 17,
@@ -441,12 +451,15 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 10,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
     color: colors.text,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
+  },
+  inputFocused: {
+    borderColor: colors.primary,
   },
   inputError: {
     borderColor: colors.danger,
@@ -466,7 +479,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: colors.dangerLight,
+    borderWidth: 1,
+    borderColor: colors.danger,
     borderRadius: 8,
     padding: 10,
     marginBottom: 14,
@@ -480,40 +495,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
-  button: {
+  rowButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    minHeight: 48,
-    paddingVertical: 12,
-    borderRadius: 10,
   },
   fullButton: {
-    flex: 0,
     marginBottom: 12,
-  },
-  buttonPrimary: {
-    backgroundColor: colors.primary,
-  },
-  buttonDanger: {
-    backgroundColor: colors.secondary,
-  },
-  buttonOutline: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: colors.textOnPrimary,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  buttonOutlineText: {
-    color: colors.primary,
   },
 });
