@@ -205,15 +205,13 @@ realizadas en el emulador Android para el Hito 4.
 
 ### 8. Uso de inteligencia artificial
 
-#### Declaración personal - Tareas M03, M14 y M15
+#### Declaración Felipe Briceño - Tareas M03, M14 y M15
 
 Durante el desarrollo de mis tareas del Hito 4 utilicé ChatGPT como herramienta de apoyo para configurar el entorno de desarrollo, resolver problemas de conectividad entre el emulador Android y el backend, organizar las pruebas funcionales y preparar la documentación técnica.
 
 También utilicé Claude Code como apoyo en la implementación de los datos de demostración del backend. Posteriormente, revisé los cambios y comprobé su funcionamiento mediante Docker, PostgreSQL y el emulador Android.
 
 Las herramientas de IA facilitaron el desarrollo y la resolución de problemas, mientras que las verificaciones, pruebas y decisiones de integración se realizaron bajo mi supervisión.
-
-Esta declaración corresponde únicamente a mi participación en el proyecto. Cada integrante debe documentar su propio uso de herramientas de inteligencia artificial.
 
 ### 9. Registro detallado de uso de IA
 
@@ -249,4 +247,54 @@ Los ejemplos de prompts se presentan resumidos y no como transcripciones literal
 
 La inteligencia artificial se utilizó como herramienta de apoyo. Los cambios fueron revisados mediante pruebas reales antes de incorporarlos al repositorio.
 
-Cada integrante del equipo debe presentar su propia declaración según las herramientas y procedimientos que utilizó.
+Las declaraciones de los demás integrantes se encuentran en la sección 10.
+
+### 10. Declaraciones individuales de IA del equipo
+
+Cada integrante declara a continuación cómo utilizó herramientas de inteligencia artificial en sus tareas.
+
+#### Javier Leiva — Inicio de sesión y perfil
+
+**Herramienta utilizada:** Claude.
+
+**Propósito:** Resolver dudas técnicas, revisar errores y validar decisiones durante el desarrollo de la base de la app, el inicio de sesión y el perfil.
+
+**Prompt de referencia:** "¿Cuál es una forma recomendada de guardar el token de sesión en una app con Expo y cómo manejar que la sesión expire?"
+
+**Resultados:** Las respuestas sirvieron como guía para organizar el cliente HTTP, la sesión y las validaciones del formulario. Las propuestas se adaptaron al proyecto antes de usarlas.
+
+**Validación:** Revisé y corregí las sugerencias antes de aplicarlas, y probé en el emulador el inicio de sesión, la sesión guardada, la edición del perfil reflejada en la web y el error con la API apagada.
+
+**Aprendizaje:** Aprendí cómo el emulador se conecta al backend local y la importancia de verificar con pruebas reales lo que sugiere la IA.
+
+#### Damián Acevedo — Catálogo y pedidos
+
+**Herramienta utilizada:** Antigravity y GitHub Copilot.
+
+**Propósito:** Resolver dudas sobre React Native y apoyar el autocompletado de código durante el desarrollo del catálogo y los pedidos.
+
+**Prompt de referencia:** "¿Cómo puedo implementar paginación al hacer scroll en una lista de React Native?"
+
+**Resultados:** Las sugerencias ayudaron a estructurar la lista del catálogo, los filtros y la vista de pedidos, ajustándolas al contrato de la API.
+
+**Validación:** Probé en el emulador la búsqueda, los filtros, el orden por precio y los pedidos de demostración con distintos estados.
+
+**Aprendizaje:** Aprendí a manejar listas paginadas y los estados de carga, error y vacío en una pantalla móvil.
+
+#### Fernando Arancibia — Productos, favoritos y arquitectura
+
+**Herramienta utilizada:** Gemini.
+
+**Propósito:** Resolver dudas sobre componentes de React Native y apoyar la documentación de la arquitectura.
+
+**Prompt de referencia:** "¿Cómo puedo representar en un diagrama una app web y una app móvil que comparten la misma API?"
+
+**Resultados:** Las respuestas sirvieron de guía para organizar el detalle de producto, los favoritos y el diagrama de arquitectura del proyecto.
+
+**Validación:** Probé en el emulador que agregar y quitar favoritos desde la app se reflejara en la web con el mismo usuario.
+
+**Aprendizaje:** Comprendí cómo dos clientes distintos pueden compartir un mismo backend y una misma base de datos.
+
+#### Responsabilidad del equipo
+
+La inteligencia artificial debe utilizarse como herramienta complementaria, manteniendo la revisión y validación humana de las soluciones implementadas.
