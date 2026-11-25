@@ -247,11 +247,11 @@ Los ejemplos de prompts se presentan resumidos y no como transcripciones literal
 
 La inteligencia artificial se utilizó como herramienta de apoyo. Los cambios fueron revisados mediante pruebas reales antes de incorporarlos al repositorio.
 
-Cada integrante del equipo debe presentar su propia declaración según las herramientas y procedimientos que utilizó.
+Las declaraciones de los demás integrantes se encuentran en la sección 10.
 
 ### 10. Declaraciones individuales de IA del equipo
 
-Las siguientes declaraciones corresponden a borradores elaborados según las responsabilidades de cada integrante. Cada estudiante deberá confirmar las herramientas utilizadas, las consultas realizadas y los resultados obtenidos antes de su entrega definitiva.
+Cada integrante declara a continuación cómo utilizó herramientas de inteligencia artificial en sus tareas.
 
 #### Javier Leiva — Inicio de sesión y perfil
 
@@ -297,4 +297,4 @@ Las siguientes declaraciones corresponden a borradores elaborados según las res
 
 #### Responsabilidad del equipo
 
-La inteligencia artificial debe utilizarse como herramienta complementaria, manteniendo la revisión y validación humana de las soluciones implementadas. Cada integrante es responsable de confirmar la exactitud de su declaración antes de presentarla como definitiva.
+La inteligencia artificial debe utilizarse como herramienta complementaria, manteniendo la revisión y validación humana de las soluciones implementadas.
